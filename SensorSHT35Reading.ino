@@ -39,15 +39,15 @@
 char ArdName[] = "--Ard1";
 int sensor2 = 44, sensor1 = 45;
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-  #define SDAPIN  20
-  #define SCLPIN  21
+//Arduino Module Detection
+#ifdef VARIANT_ARDUINO_MEGA_ // If the Arduino Mega is detected
+  #define SDAPIN  21
+  #define SCLPIN  20
   #define RSTPIN  7
   #define SERIAL SerialUSB
-#else
-  #define SDAPIN  20 //A4
-  #define SCLPIN  21 //A5
+#else //If the Arduino Uno is detected
+  #define SDAPIN  A4 //A4
+  #define SCLPIN  A5 //A5
   #define RSTPIN  2
   #define SERIAL Serial
 #endif
@@ -69,42 +69,43 @@ void setup()
     }
 }
 
-//Function to read the sensor and output its value. Argument allows us to set which sensor to read. 2 is 44, 1 is 43.
+//Function to read the sensor and output its value. Argument allows us to set which sensor to read. 2 is 44, 1 is 45.
+//senseSelect is the variable that another function can input which sensor wants to be read
 void sensorRead(int senseSelect)
 {
   u16 value=0;
     u8 data[6]={0};
-    float temp, hum, temp2,hum2;
-    int error = 1;
+    float temp, hum, temp2,hum2; //Initilize the variables for the sensors. without the 2, it is variable for the addr 44 sensor. With the 2, it is variable for the addr 45 sensor
+    int error = 1; // Basically if there is an error detected in the system, it will not run the serial output commands
     if (senseSelect == 1){
-      SHT35 sensor(SCLPIN,0x44);
+      SHT35 sensor(SCLPIN,0x44);//Read sensor with address 0x44 if senseSelect is 1
       if(NO_ERROR!=sensor.read_meas_data_single_shot(HIGH_REP_WITH_STRCH,&temp,&hum))
       {
         SERIAL.println("read temp 44 failed!!\n\n\n");
       }
       else
       {
-        SERIAL.println("Read 44 temp");
+        //SERIAL.println("Read 44 temp");
         error = 0;
       }
     }
     else if (senseSelect == 2){
-      SHT35 sensor(SCLPIN,0x45);
+      SHT35 sensor(SCLPIN,0x45);// Read sensor with address 0x45 if sense Select is 2
       if(NO_ERROR!=sensor.read_meas_data_single_shot(HIGH_REP_WITH_STRCH,&temp2,&hum2))
       {
         SERIAL.println("read temp 45 failed!!\n\n\n");
       }
       else
       {
-        SERIAL.println("Read 45 temp");
+        //SERIAL.println("Read 45 temp");
         error = 0;
       }
     }
-    if (error == 1){
-      error = 1;
+    
+    if (error == 1){ //This if statement does nothing. It is there to prevent breaking backwards compatibility with the changes above.
+      error = 1; 
     }
-    else
-    {
+    else{
       //First print the arduino name into the terminal
       SERIAL.print(ArdName);
       SERIAL.print(",");
@@ -112,8 +113,7 @@ void sensorRead(int senseSelect)
       if (senseSelect == 2){
         SERIAL.print(sensor2);
       }
-      else if (senseSelect == 1)
-      {
+      else if (senseSelect == 1){
         SERIAL.print(sensor1);
       }
       //This prints the time that the progarm was started
@@ -156,6 +156,7 @@ void recieveCommand()
 { 
       //R=82 1=49 2=50
       int commandRead = Serial.read();
+      //SERIAL.print(commandRead);
       if (commandRead == 50){
         sensorRead(2); //Arguments are (sensor select,)
       }
@@ -171,7 +172,7 @@ void loop()
     if (commandRead > 10)
     {
       recieveCommand();
-    }  
-    
-    ledBlink();
+    }      
+    //ledBlink(); //This will blink the onboard LED. Useless mostly.
+    delay(15); //The delay is necessary or else it will not properly read the serial commands.
 }
