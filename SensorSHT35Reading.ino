@@ -52,7 +52,7 @@ int sensor2 = 44, sensor1 = 45;
   #define SERIAL Serial
 #endif
 
-SHT35 sensor(SCLPIN);
+SHT35 sensor(SCLPIN,0x44);
 
 int dataCollectionInterval = 50; //In miliseconds
 
@@ -75,9 +75,33 @@ void sensorRead(int senseSelect)
   u16 value=0;
     u8 data[6]={0};
     float temp, hum, temp2,hum2;
-    if(NO_ERROR!=sensor.read_meas_data_single_shot(HIGH_REP_WITH_STRCH,&temp2,&hum2))
-    {
-      SERIAL.println("read temp failed!!\n\n\n");
+    int error = 1;
+    if (senseSelect == 1){
+      SHT35 sensor(SCLPIN,0x44);
+      if(NO_ERROR!=sensor.read_meas_data_single_shot(HIGH_REP_WITH_STRCH,&temp,&hum))
+      {
+        SERIAL.println("read temp 44 failed!!\n\n\n");
+      }
+      else
+      {
+        SERIAL.println("Read 44 temp");
+        error = 0;
+      }
+    }
+    else if (senseSelect == 2){
+      SHT35 sensor(SCLPIN,0x45);
+      if(NO_ERROR!=sensor.read_meas_data_single_shot(HIGH_REP_WITH_STRCH,&temp2,&hum2))
+      {
+        SERIAL.println("read temp 45 failed!!\n\n\n");
+      }
+      else
+      {
+        SERIAL.println("Read 45 temp");
+        error = 0;
+      }
+    }
+    if (error == 1){
+      error = 1;
     }
     else
     {
