@@ -37,7 +37,7 @@
 
 //This is Arduino 1
 char ArdName[] = "--Ard1";
-int sensor2 = 44, sensor1 = 45; //Default address is actually 45.
+int sensor2 = 44, sensor1 = 45;
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
@@ -46,8 +46,8 @@ int sensor2 = 44, sensor1 = 45; //Default address is actually 45.
   #define RSTPIN  7
   #define SERIAL SerialUSB
 #else
-  #define SDAPIN  A4
-  #define SCLPIN  A5
+  #define SDAPIN  20 //A4
+  #define SCLPIN  21 //A5
   #define RSTPIN  2
   #define SERIAL Serial
 #endif
@@ -69,7 +69,7 @@ void setup()
     }
 }
 
-//Function to read the sensor and output its value. Argument allows us to set which sensor to read. Sensor 2 is 44, Sensor 1 is 45.
+//Function to read the sensor and output its value. Argument allows us to set which sensor to read. 2 is 44, 1 is 43.
 void sensorRead(int senseSelect)
 {
   u16 value=0;
@@ -133,10 +133,10 @@ void recieveCommand()
       //R=82 1=49 2=50
       int commandRead = Serial.read();
       if (commandRead == 50){
-        sensorRead(2); //Arguments are (sensor select,) //Read sensor Addr 44
+        sensorRead(2); //Arguments are (sensor select,)
       }
       else if (commandRead == 49){
-        sensorRead(1); //Read Sensor Addr 45
+        sensorRead(1);
       }      
 }
 
@@ -144,10 +144,10 @@ void recieveCommand()
 void loop()
 {
     int commandRead = Serial.read();
-    if (commandRead > 10) //Reads the first letter,
+    if (commandRead > 10)
     {
       recieveCommand();
     }  
     
-    //ledBlink(); // Flashes the onboard LED light. Useless honestly
+    ledBlink();
 }
