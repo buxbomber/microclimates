@@ -69,7 +69,7 @@ void setup()
     }
 }
 
-//Function to read the sensor and output its value. Argument allows us to set which sensor to read. 2 is 44, 1 is 43.
+//Function to read the sensor and output its value. Argument allows us to set which sensor to read. Sensor 2 is 44, Sensor 1 is 45.
 void sensorRead(int senseSelect)
 {
   u16 value=0;
@@ -133,10 +133,10 @@ void recieveCommand()
       //R=82 1=49 2=50
       int commandRead = Serial.read();
       if (commandRead == 50){
-        sensorRead(2); //Arguments are (sensor select,)
+        sensorRead(2); //Arguments are (sensor select,) //Read sensor Addr 44
       }
       else if (commandRead == 49){
-        sensorRead(1);
+        sensorRead(1); //Read Sensor Addr 45
       }      
 }
 
@@ -144,10 +144,10 @@ void recieveCommand()
 void loop()
 {
     int commandRead = Serial.read();
-    if (commandRead > 10)
+    if (commandRead > 10) //Reads the first letter,
     {
       recieveCommand();
     }  
     
-    ledBlink();
+    //ledBlink(); // Flashes the onboard LED light. Useless honestly
 }
