@@ -37,7 +37,7 @@
 
 //This is Arduino 1
 char ArdName[] = "--Ard1";
-int sensor2 = 44, sensor1 = 45; //Default address is actually 45
+int sensor2 = 44, sensor1 = 45; //Default address is actually 45.
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
