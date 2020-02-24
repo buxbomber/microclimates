@@ -55,6 +55,7 @@ int sensor2 = 44, sensor1 = 45;
 SHT35 sensor(SCLPIN,0x44);
 
 int dataCollectionInterval = 50; //In miliseconds
+int timeoutCommand = 0;
 
 
 void setup()
@@ -155,6 +156,7 @@ void ledBlink()
 void recieveCommand()
 { 
       //R=82 1=49 2=50
+      //delay(15);
       int commandRead = Serial.read();
       //SERIAL.print(commandRead);
       if (commandRead == 50){
@@ -171,8 +173,20 @@ void loop()
     int commandRead = Serial.read();
     if (commandRead > 10)
     {
-      recieveCommand();
+      timeoutCommand = millis()/1000;
+      digitalWrite(LED_BUILTIN, LOW);
+      recieveCommand();      
     }      
+    
+    if ((millis()/1000 - timeoutCommand) >= 5){ //If the arduino does not recieve a...
+	//command, every 5 seconds, it will send a reading of sensor 1 just in case so that...
+	//the python can continue to run.		
+      digitalWrite(LED_BUILTIN, HIGH);
+      sensorRead(1);
+      timeoutCommand = millis()/1000;
+      //digitalWrite(LED_BUILTIN, LOW);
+    }
+
     //ledBlink(); //This will blink the onboard LED. Useless mostly.
     delay(15); //The delay is necessary or else it will not properly read the serial commands.
 }
