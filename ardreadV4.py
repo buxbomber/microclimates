@@ -121,8 +121,9 @@ def loop():
                 worksheet2.write(row, col + 3, ardTime)
                 worksheet2.write(row, col + 4, temp)
                 worksheet2.write(row, col + 5, hum)
+            time.sleep(interval/sensornum)
 
-        time.sleep(interval)
+
         if collectiontype == 1:
             currentt = time.localtime()
             currentt = (currentt.tm_hour*60)+(currentt.tm_min)+(currentt.tm_sec/60)
