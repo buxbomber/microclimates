@@ -15,7 +15,8 @@ def loop():
         print("Windows Detected")
     print("Enter the baud rate or leave blank (Default = 9600)")
     #If changing the baud
-    baud = input()
+    #baud = input()
+    baud = 9600
     if baud == '':
         baud = 9600
     else:
@@ -68,7 +69,10 @@ def loop():
     try:
         ser = serial.Serial(port=serialPort, baudrate=baud)
     except:
-        print("The Arduino is not working or not connected\n--\n--")
+        try:
+            ser = serial.Serial(port="/dev/cu.usbmodem14201", baudrate=baud)
+        except:
+            print("The Arduino is not working or not connected\n--\n--")
 
     # Initialize Workbook
     global workbook 
@@ -95,7 +99,6 @@ def loop():
                 ser.write(str.encode("R1"))
             else:
                 ser.write(str.encode("R2"))
-
             cc = str(ser.readline())
             cc = (cc[2:][:-5])   
             cc = (cc.split(','))
@@ -121,7 +124,7 @@ def loop():
                 worksheet2.write(row, col + 3, ardTime)
                 worksheet2.write(row, col + 4, temp)
                 worksheet2.write(row, col + 5, hum)
-            time.sleep(interval/sensornum)
+            time.sleep(interval/2)
 
 
         if collectiontype == 1:
@@ -139,4 +142,5 @@ def destroy():
 try:
     loop()
 except KeyboardInterrupt:
+    print("\nWriting")
     destroy()
