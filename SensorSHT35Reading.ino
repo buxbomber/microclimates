@@ -36,7 +36,7 @@
 #include <Wire.h>
 
 //This is Arduino 1
-char ArdName[] = "--Ard1";
+char ArdName[] = "Ard1";
 int sensor2 = 44, sensor1 = 45;
 
 //Arduino Module Detection
