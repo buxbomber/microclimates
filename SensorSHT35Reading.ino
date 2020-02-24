@@ -178,9 +178,10 @@ void loop()
       recieveCommand();      
     }      
     
-    if ((millis()/1000 - timeoutCommand) >= 5){ //If the arduino does not recieve a...
-	//command, every 5 seconds, it will send a reading of sensor 1 just in case so that...
-	//the python can continue to run.		
+    if ((millis()/1000 - timeoutCommand) >= 5){
+      //If the arduino does not recieve a...
+      //command, every 5 seconds, it will send a reading of sensor 1 just in case so that...
+      //the python can continue to run.
       digitalWrite(LED_BUILTIN, HIGH);
       sensorRead(1);
       timeoutCommand = millis()/1000;
