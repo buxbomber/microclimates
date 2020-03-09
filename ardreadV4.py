@@ -11,7 +11,7 @@ def loop():
         serialPort = "/dev/cu.usbmodem14101"
         print("MAC Detected")
     else:
-        serialPort = "COM4"
+        serialPort = "COM3"
         print("Windows Detected")
     print("Enter the baud rate or leave blank (Default = 9600)")
     #If changing the baud
@@ -108,9 +108,14 @@ def loop():
             temp = cc[3]
             hum = cc[4]
 
+            try:
+                sensorAdd = int(sensorAdd)
+            except:
+                sensorAdd = 45
+
             print(ardNum,sensorAdd,current_time,ardTime,temp,hum)
             # Write data to Workbook
-            if int(ardNum) == 45:
+            if sensorAdd == 45:
                 worksheet1.write(row, col, ardNum)
                 worksheet1.write(row, col + 1, sensorAdd)
                 worksheet1.write(row, col + 2, current_time)
