@@ -36,20 +36,22 @@
 #include <Wire.h>
 
 //This is Arduino 1
-char ArdName[] = "Ard1";
+//char ArdName[] = "Ard1";
 int sensor2 = 44, sensor1 = 45;
 
 //Arduino Module Detection
-#ifdef VARIANT_ARDUINO_MEGA_ // If the Arduino Mega is detected
+#ifdef ARDUINO_AVR_MEGA2560_ // If the Arduino Mega is detected
   #define SDAPIN  21
   #define SCLPIN  20
   #define RSTPIN  7
   #define SERIAL SerialUSB
+  #define ArdName "Ard2"
 #else //If the Arduino Uno is detected
   #define SDAPIN  A4 //A4
   #define SCLPIN  A5 //A5
   #define RSTPIN  2
   #define SERIAL Serial
+  #define ArdName "Ard1"
 #endif
 
 SHT35 sensor(SCLPIN,0x44);
@@ -178,7 +180,7 @@ void loop()
       recieveCommand();      
     }      
     
-    if ((millis()/1000 - timeoutCommand) >= 3){
+    if ((millis()/1000 - timeoutCommand) >= 2){
       //If the arduino does not recieve a...
       //command, every 3 seconds, it will send a reading of sensor 1 just in case so that...
       //the python can continue to run.
