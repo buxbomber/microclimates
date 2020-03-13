@@ -8,14 +8,16 @@ def loop():
     #Code to detect the OS and then try the USB port
     serialPort = sys.platform
     if serialPort == 'darwin':
-        serialPort = "/dev/cu.usbmodem14101"
-        serialPort2 = "/dev/cu.usbmodem14201"
+        serialPort = "/dev/cu.usbmodem14101" #Initial USB Port
+        serialPort2 = "/dev/cu.usbmodem14201" #Alternative USB Port
         print("MAC Detected")
     elif serialPort == 'linux':
         serialPort = "/dev/ttyACM0"
+        serialPort2 = "/dev/ttyACM0"
         print("Linux Detected")
     else:
-        serialPort = "COM3"
+        serialPort = "COM3" 
+        serialPort2 = "COM4"
         print("Windows Detected")
     print("Enter the baud rate or leave blank (Default = 9600)")
     #If changing the baud
@@ -86,7 +88,9 @@ def loop():
         worksheet2 = workbook.add_worksheet()
     row = 0
     col = 0
-    print(time.time())
+
+
+
     for i in range(datapoints):
 
         row = i
@@ -97,11 +101,16 @@ def loop():
             current_time = time.strftime("%H:%M:%S", t)
 
             # Read Arduino output, parse, and assign to entrynum, temp, and hum
-            if j == 0:
-                ser.write(str.encode("R1"))
-            else:
-                ser.write(str.encode("R2"))
-            cc = str(ser.readline())
+            cc2 = "Fail"
+            while cc2 == "Fail": #Arduino now sends a 'Fail' if no command recieved. ArdRead will repeat command
+                if j == 0:
+                    ser.write(str.encode("R1"))
+                else:
+                    ser.write(str.encode("R2"))
+                cc2 = str(ser.readline())
+                if cc2 == "Fail":
+                    print("Fail Recovered")
+            cc = cc2
             cc = (cc[2:][:-5])   
             cc = (cc.split(','))
             ardNum = cc[0]
@@ -110,14 +119,9 @@ def loop():
             temp = cc[3]
             hum = cc[4]
 
-            try:
-                sensorAdd = int(sensorAdd)
-            except:
-                sensorAdd = 45
-
             print(ardNum,sensorAdd,current_time,ardTime,temp,hum)
             # Write data to Workbook
-            if sensorAdd == 45:
+            if j == 0:
                 worksheet1.write(row, col, ardNum)
                 worksheet1.write(row, col + 1, sensorAdd)
                 worksheet1.write(row, col + 2, current_time)
@@ -142,7 +146,6 @@ def loop():
                 break
     workbook.close()
 
-
 def destroy():
     workbook.close()
 
@@ -150,5 +153,4 @@ try:
     loop()
 except KeyboardInterrupt:
     print("\nWriting")
-    print(time.time())
     destroy()

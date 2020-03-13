@@ -180,12 +180,11 @@ void loop()
       recieveCommand();      
     }      
     
-    if ((millis()/1000 - timeoutCommand) >= 2){
+    if ((millis()/1000 - timeoutCommand) >= 3){
       //If the arduino does not recieve a...
-      //command, every 3 seconds, it will send a reading of sensor 1 just in case so that...
-      //the python can continue to run.
+      //command, every 3 seconds, it will send a 'Fail' Command
       digitalWrite(LED_BUILTIN, HIGH);
-      sensorRead(1);
+      SERIAL.println("Fail");
       timeoutCommand = millis()/1000;
       //digitalWrite(LED_BUILTIN, LOW);
     }
