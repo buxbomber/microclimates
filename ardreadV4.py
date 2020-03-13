@@ -9,7 +9,11 @@ def loop():
     serialPort = sys.platform
     if serialPort == 'darwin':
         serialPort = "/dev/cu.usbmodem14101"
+        serialPort2 = "/dev/cu.usbmodem14201"
         print("MAC Detected")
+    elif serialPort == 'linux':
+        serialPort = "/dev/ttyACM0"
+        print("Linux Detected")
     else:
         serialPort = "COM3"
         print("Windows Detected")
@@ -70,7 +74,7 @@ def loop():
         ser = serial.Serial(port=serialPort, baudrate=baud)
     except:
         try:
-            ser = serial.Serial(port="/dev/cu.usbmodem14201", baudrate=baud)
+            ser = serial.Serial(port=serialPort2, baudrate=baud)
         except:
             print("The Arduino is not working or not connected\n--\n--")
 
@@ -82,9 +86,7 @@ def loop():
         worksheet2 = workbook.add_worksheet()
     row = 0
     col = 0
-
-
-
+    print(time.time())
     for i in range(datapoints):
 
         row = i
@@ -148,4 +150,5 @@ try:
     loop()
 except KeyboardInterrupt:
     print("\nWriting")
+    print(time.time())
     destroy()
