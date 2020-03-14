@@ -64,7 +64,7 @@ void setup()
 {
     pinMode(LED_BUILTIN, OUTPUT);
     SERIAL.begin(9600);
-    SERIAL.println("--Arduino #, Sensor Addr, Time Start (s),Temp (c),Humidity(RH)");
+    //SERIAL.println("--Arduino #, Sensor Addr, Time Start (s),Temp (c),Humidity(RH)");
     //Sensor initialization process
     if(sensor.init())
     {
@@ -133,11 +133,12 @@ void sensorRead(int senseSelect)
       //This prints the humidity of the selected sensor
       SERIAL.print(',');
       if (senseSelect == 2){
-        SERIAL.println(hum2);
+        SERIAL.print(hum2);
       }
       else if (senseSelect == 1){
-        SERIAL.println(hum);
+        SERIAL.print(hum);
       }
+      SERIAL.println(",AWK");
     }
 }
 
@@ -180,14 +181,14 @@ void loop()
       recieveCommand();      
     }      
     
-    if ((millis()/1000 - timeoutCommand) >= 3){
+    //if ((millis()/1000 - timeoutCommand) >= 3){
       //If the arduino does not recieve a...
       //command, every 3 seconds, it will send a 'Fail' Command
-      digitalWrite(LED_BUILTIN, HIGH);
-      sensorRead(1);
-      timeoutCommand = millis()/1000;
+      //digitalWrite(LED_BUILTIN, HIGH);
+      //sensorRead(1);
+      //timeoutCommand = millis()/1000;
       //digitalWrite(LED_BUILTIN, LOW);
-    }
+    //}
 
     //ledBlink(); //This will blink the onboard LED. Useless mostly.
     delay(15); //The delay is necessary or else it will not properly read the serial commands.

@@ -19,7 +19,7 @@ def loop():
         serialPort = "COM3" 
         serialPort2 = "COM4"
         print("Windows Detected")
-    print("Enter the baud rate or leave blank (Default = 9600)")
+    #print("Enter the baud rate or leave blank (Default = 9600)")
     #If changing the baud
     #baud = input()
     baud = 9600
@@ -73,12 +73,13 @@ def loop():
 
     # "COM3" is the port that your Arduino board is connected.set it to port that your are using        
     try:
-        ser = serial.Serial(port=serialPort, baudrate=baud)
+        ser = serial.Serial(port=serialPort, baudrate=baud, timeout = 1.5)
     except:
         try:
-            ser = serial.Serial(port=serialPort2, baudrate=baud)
+            ser = serial.Serial(port=serialPort2, baudrate=baud, timeout = 1.5)
         except:
             print("The Arduino is not working or not connected\n--\n--")
+            sys.exit()
 
     # Initialize Workbook
     global workbook 
@@ -99,25 +100,25 @@ def loop():
             # Get time
             t = time.localtime()
             current_time = time.strftime("%H:%M:%S", t)
-
-            # Read Arduino output, parse, and assign to entrynum, temp, and hum
-            cc2 = "Fail"
-            while cc2 == "Fail": #Arduino now sends a 'Fail' if no command recieved. ArdRead will repeat command
+            # Read Arduino output, parse, and as2sign to entrynum, temp, and hum
+            cc = []
+            while cc == [] or not ("AWK" in cc):            
                 if j == 0:
                     ser.write(str.encode("R1"))
                 else:
                     ser.write(str.encode("R2"))
-                cc2 = str(ser.readline())
-                if cc2 == "Fail":
-                    print("Fail Recovered")
-            cc = cc2
+                cc = str(ser.readline())
             cc = (cc[2:][:-5])   
-            cc = (cc.split(','))
-            ardNum = cc[0]
-            sensorAdd = cc[1]
-            ardTime = cc[2]
-            temp = cc[3]
-            hum = cc[4]
+            cc = (cc.split(','))            
+            try:
+                ardNum = cc[0]
+                sensorAdd = cc[1]                
+                ardTime = cc[2]
+                temp = cc[3]
+                hum = cc[4]
+            except:
+                print("------\nArduino Not Configured Properly\n")
+                sys.exit()
 
             print(ardNum,sensorAdd,current_time,ardTime,temp,hum)
             # Write data to Workbook
@@ -135,7 +136,7 @@ def loop():
                 worksheet2.write(row, col + 3, ardTime)
                 worksheet2.write(row, col + 4, temp)
                 worksheet2.write(row, col + 5, hum)
-            time.sleep(interval/2)
+        time.sleep(interval)
 
 
         if collectiontype == 1:
@@ -148,6 +149,7 @@ def loop():
 
 def destroy():
     workbook.close()
+    
 
 try:
     loop()
