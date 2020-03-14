@@ -35,10 +35,10 @@ def loop():
     else:
         interval = int(interval)
     #How many sensors are connected
-    print("How many sensors are connected? (Default = 1)")
+    print("How many sensors are connected? (Default = 2)")
     sensornum = input()
     if sensornum == '':
-        sensornum = 1
+        sensornum = 2
     else:
         sensornum = int(sensornum)
     #Collecting for number or time
@@ -89,9 +89,7 @@ def loop():
         worksheet2 = workbook.add_worksheet()
     row = 0
     col = 0
-
-
-
+    
     for i in range(datapoints):
 
         row = i
@@ -142,17 +140,17 @@ def loop():
         if collectiontype == 1:
             currentt = time.localtime()
             currentt = (currentt.tm_hour*60)+(currentt.tm_min)+(currentt.tm_sec/60)
-            timediff = currentt - initt
-            if timediff >= minutes:
+            if (currentt - initt) >= minutes:
                 break
-    workbook.close()
+    destroy()
 
 def destroy():
+    print("\nWriting")
     workbook.close()
+    sys.exit()
     
 
 try:
     loop()
-except KeyboardInterrupt:
-    print("\nWriting")
+except KeyboardInterrupt:    
     destroy()
