@@ -54,9 +54,9 @@ def loop():
         print("Enter datapoints to collect or leave blank (Default = 30)")
         datapoints = input()
         if datapoints == '':
-            datapoints = 31
+            datapoints = 30
         else:
-            datapoints = int(datapoints)+1
+            datapoints = int(datapoints)
     elif collectiontype == 1:
         #How long to collect data for
         print("Enter how many minutes to collect or leave blank (Default = 1)")
