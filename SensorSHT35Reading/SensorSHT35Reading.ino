@@ -184,7 +184,7 @@ void loop()
       //If the arduino does not recieve a...
       //command, every 3 seconds, it will send a 'Fail' Command
       digitalWrite(LED_BUILTIN, HIGH);
-      SERIAL.println("Fail");
+      sensorRead(1);
       timeoutCommand = millis()/1000;
       //digitalWrite(LED_BUILTIN, LOW);
     }
