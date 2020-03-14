@@ -58,7 +58,7 @@ def loop():
         else:
             datapoints = int(datapoints)+1
     elif collectiontype == 1:
-        #How long to collect
+        #How long to collect data for
         print("Enter how many minutes to collect or leave blank (Default = 1)")
         minutes = input()
         if minutes == '':
@@ -66,34 +66,39 @@ def loop():
         else:
             minutes = float(minutes)
         datapoints = 999999999
-        initt = time.localtime()
+        initt = time.localtime()#Initiate the timer for time based data collection
         initt = (initt.tm_hour*60)+(initt.tm_min)+(initt.tm_sec/60)
-
-        
+        startup = False #To activate the pause timer later so that the first datapoint gets captured        
 
     # "COM3" is the port that your Arduino board is connected.set it to port that your are using        
-    try:
+    try:#Primary port to try
         ser = serial.Serial(port=serialPort, baudrate=baud, timeout = 1.5)
     except:
-        try:
+        try:#Alternative port to try
             ser = serial.Serial(port=serialPort2, baudrate=baud, timeout = 1.5)
         except:
             print("The Arduino is not working or not connected\n--\n--")
             sys.exit()
+    
+    serial.PARITY_EVEN #Parity activation?
 
-    # Initialize Workbook
+    # Initialize Workbook 1 and 2 if selected
     global workbook 
     workbook = xlsxwriter.Workbook('sensordata.xlsx')
     worksheet1 = workbook.add_worksheet()
     if sensornum >=2:
         worksheet2 = workbook.add_worksheet()
-    row = 0
+    row = 2
     col = 0
-    
-    for i in range(datapoints):
+    cc = ["Arduino #","Sensor Addr","Time","Elapsed (s)","Temp (C)","Hum (RH%)"]
+    for i in range(6):#Initiate the first row of the spreadsheet with the category names
+        worksheet1.write(0, col + i, cc[i])
+        try:
+            worksheet2.write(0, col + i, cc[i])
+        except:
+            continue
 
-        row = i
-
+    for row in range(1,datapoints+1):
         for j in range(sensornum):
             # Get time
             t = time.localtime()
@@ -102,21 +107,37 @@ def loop():
             cc = []
             while cc == [] or not ("AWK" in cc):            
                 if j == 0:
-                    ser.write(str.encode("R1"))
+                    ser.write(str.encode("R1"))#Read Sensor 1
                 else:
-                    ser.write(str.encode("R2"))
+                    ser.write(str.encode("R2"))#Read Sensor 2
                 cc = str(ser.readline())
-            cc = (cc[2:][:-5])   
-            cc = (cc.split(','))            
+            cc = (cc[2:][:-5])   #Get rid of the extra bits in front of the code and end
+            cc = (cc.split(','))    #Split data by detecting the commas        
             try:
                 ardNum = cc[0]
                 sensorAdd = cc[1]                
                 ardTime = cc[2]
                 temp = cc[3]
                 hum = cc[4]
-            except:
-                print("------\nArduino Not Configured Properly\n")
-                sys.exit()
+            except:# Try reading the arduino again before throwing another exception and ending the program.
+                try:
+                    cc = []
+                    while cc == [] or not ("AWK" in cc):            
+                        if j == 0:
+                            ser.write(str.encode("R1"))
+                        else:
+                            ser.write(str.encode("R2"))
+                        cc = str(ser.readline())
+                    cc = (cc[2:][:-5])   
+                    cc = (cc.split(','))
+                    ardNum = cc[0]
+                    sensorAdd = cc[1]                
+                    ardTime = cc[2]
+                    temp = cc[3]
+                    hum = cc[4]
+                except:
+                    print("------\nArduino Not Configured Properly\n")
+                    sys.exit()
 
             print(ardNum,sensorAdd,current_time,ardTime,temp,hum)
             # Write data to Workbook
@@ -136,21 +157,19 @@ def loop():
                 worksheet2.write(row, col + 5, hum)
         time.sleep(interval)
 
-
-        if collectiontype == 1:
+        if (collectiontype == 1) and startup: #Timer to check when to end program for time based data collection
             currentt = time.localtime()
             currentt = (currentt.tm_hour*60)+(currentt.tm_min)+(currentt.tm_sec/60)
             if (currentt - initt) >= minutes:
                 break
+        startup = True
     destroy()
 
-def destroy():
+def destroy():#Will clean up the program and close the worksheet
     print("\nWriting")
     workbook.close()
-    sys.exit()
-    
-
+    sys.exit()   
 try:
-    loop()
-except KeyboardInterrupt:    
+    loop() #Main program
+except KeyboardInterrupt:   #If Control C is pressed 
     destroy()
